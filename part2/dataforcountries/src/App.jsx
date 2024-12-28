@@ -46,6 +46,9 @@ function App() {
   // )
   const [country, setCountry] = useState('')
   const [countries, setCountries] = useState([])
+  const [temperature, setTemperature] = useState(0)
+  const [icon, setIcon] = useState('')
+  const [wind, setWind] = useState(0)
  
 
   useEffect(() => {
@@ -65,13 +68,18 @@ function App() {
         })
         
         setCountries(count.slice())
-      
-      .get('https://api.openweathermap.org/data/2.5/weather?q=London&appid=385a3b565ed20a0eaddc31a7ad29a621')
+    axios  
+      .get(`https://api.openweathermap.org/data/2.5/weather?q=${country}&appid=385a3b565ed20a0eaddc31a7ad29a621`)
       .then(response => {
         console.log('promise fulfilled')
-        console.log(response.data)
+        console.log((response.data.main.temp - 273.15).toFixed(2))
+        setTemperature((response.data.main.temp - 273.15).toFixed(2))
+        console.log(response.data.weather[0].icon)
+        setIcon(response.data.weather[0].icon)
+        setWind(response.data.wind.speed)
         
-      }) 
+      })
+    
         
       })
   }, [country])
@@ -92,13 +100,13 @@ function App() {
       {JSON.stringify(countries, null, 2)}
       
       </pre> */}
-      <Display countries={countries} handleClick={handleClick} onClick/>
+      <Display countries={countries} handleClick={handleClick} temperature={temperature} icon={icon} wind = {wind}/>
     </div>
     
   )
 }
 
-const Display = ({countries,handleClick}) => {
+const Display = ({countries,handleClick,temperature,icon,wind}) => {
   
  
 
@@ -129,8 +137,10 @@ const Display = ({countries,handleClick}) => {
               ))}
             </ul>
             <img style={{ width: '100px', height: '100px' }} src={countries[0].flags.png} alt="" />
-            <h3>Weather in Helsinki</h3>
-            <p>temperature: </p>
+            <h3>Weather in {countries[0].name.common}</h3>
+            <p>temperature: {temperature} Celcius</p>
+            <img src={`https://openweathermap.org/img/wn/${icon}@2x.png`} alt="" />
+            <p>wind {wind} m/s</p>
           </div>
         </div>
       );
